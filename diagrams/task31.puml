@@ -1,0 +1,97 @@
+@startuml
+package "Domain Model" {
+  class User {
+    +userId: UUID
+    +name: String
+    +email: String
+    +phone: String
+    +address: String
+    +passwordHash: String
+    +status: Enum
+    +limits: PurchaseLimits
+  }
+
+  class Event {
+    +eventId: UUID
+    +name: String
+    +organizer: String
+    +venue: Venue
+    +startDateTime: DateTime
+    +endDateTime: DateTime
+    +ticketTypes: List<TicketType>
+    +status: Enum
+  }
+
+  class TicketType {
+    +ticketTypeId: UUID
+    +name: String
+    +price: Decimal
+    +seatAssignment: Boolean
+    +inventory: int
+    +conditions: PurchaseConditions
+  }
+
+  class Reservation {
+    +reservationId: UUID
+    +userId: UUID
+    +eventId: UUID
+    +ticketTypeId: UUID
+    +seats: List<Seat>
+    +status: Enum {HELD, CONFIRMED, EXPIRED, CANCELLED}
+    +holdExpiresAt: DateTime
+  }
+
+  class Purchase {
+    +purchaseId: UUID
+    +reservationId: UUID
+    +paymentId: UUID
+    +amount: Decimal
+    +status: Enum {PENDING, SUCCESS, FAILED, REFUNDED}
+    +createdAt: DateTime
+  }
+
+  class Payment {
+    +paymentId: UUID
+    +method: String
+    +transactionRef: String
+    +amount: Decimal
+    +status: Enum
+  }
+
+  class Subscription {
+    +subscriptionId: UUID
+    +userId: UUID
+    +passType: String
+    +validFrom: DateTime
+    +validUntil: DateTime
+    +includedEvents: List<UUID>
+  }
+
+  class AuditLog {
+    +logId: UUID
+    +entity: String
+    +entityId: UUID
+    +action: String
+    +timestamp: DateTime
+    +details: String
+  }
+
+  class Penalty {
+    +penaltyId: UUID
+    +userId: UUID
+    +type: String
+    +expiresAt: DateTime
+    +effects: String
+  }
+
+  User --> Reservation
+  Reservation --> TicketType
+  Reservation --> Event
+  Reservation --> Purchase
+  Purchase --> Payment
+  User --> Subscription
+  Event --> TicketType
+  User --> Penalty
+  All --> AuditLog
+}
+@enduml

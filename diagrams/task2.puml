@@ -1,0 +1,36 @@
+@startuml
+left to right direction
+skinparam usecase {
+  BackgroundColor<<Customer>> #FCE4D6
+  BorderColor black
+}
+actor "Registered User" as User
+actor "Staff (Office)" as Staff
+actor "Administrator" as Admin
+
+usecase UC1 as "Browse Events"
+usecase UC2 as "Reserve Tickets"
+usecase UC3 as "Purchase Tickets"
+usecase UC4 as "Subscribe / Buy Season Pass"
+usecase UC5 as "Manage Booking (cancel/modify)"
+usecase UC6 as "Add Event & Ticket Type"
+usecase UC7 as "Manage Inventory & Refunds"
+usecase UC8 as "Configure System Parameters"
+
+User --> UC1
+User --> UC2
+User --> UC3
+User --> UC4
+User --> UC5
+
+Staff --> UC6
+Staff --> UC7
+
+Admin --> UC6
+Admin --> UC7
+Admin --> UC8
+
+UC2 --> UC5 : "may lead to"
+UC3 --> UC7 : "may require refund"
+UC4 --> UC5 : "subscription modifications"
+@enduml

@@ -1,0 +1,46 @@
+flowchart LR
+  subgraph Customer
+    C_Browse[Browse events]
+    C_Select[Select event / seats or season pass]
+    C_Confirm[Confirm reservation / purchase]
+    C_Pay[Provide payment]
+  end
+
+  subgraph System
+    S_ShowCatalogue[[Show catalogue & details]]
+    S_CheckAvailability{Check availability}
+    S_Hold["Hold tickets (reservation)\nwith timer"]
+    S_NotifyReserve[Notify: reservation created]
+    S_PaymentGateway[Process payment]
+    S_ConfirmPurchase[Confirm and issue tickets]
+    S_Expire[Expire reservation -> release inventory]
+    S_Record[Record transaction & audit log]
+    S_PenaltyCheck{Apply penalties?}
+  end
+
+  subgraph Staff/Admin
+    A_ManageEvents[Add/Edit Events & Ticket Types]
+    A_AdjustRules[Adjust limits, penalties, system params]
+    A_HandleRefunds[Handle refunds & exceptions]
+  end
+
+  C_Browse -->|search/filter| S_ShowCatalogue
+  C_Select -->|choose| S_CheckAvailability
+  S_CheckAvailability -- available --> S_Hold
+  S_Hold --> S_NotifyReserve
+  S_NotifyReserve --> C_Confirm
+  C_Confirm -->|confirm within hold window| C_Pay
+  C_Pay --> S_PaymentGateway
+  S_PaymentGateway -->|success| S_ConfirmPurchase
+  S_PaymentGateway -->|failure| S_Expire
+  S_ConfirmPurchase --> S_Record
+  S_Expire --> S_Record
+  S_Record --> S_PenaltyCheck
+  S_PenaltyCheck -->|penalty applies| A_AdjustRules
+
+  %% reservation expiry timer path
+  S_Hold -. timer expires .-> S_Expire
+  %% staff actions
+  A_ManageEvents --> S_ShowCatalogue
+  A_AdjustRules --> S_PenaltyCheck
+  A_HandleRefunds --> S_Record
